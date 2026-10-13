@@ -1,11 +1,13 @@
 package mx.edu.utez.proyecto1c.service.usuario;
 
+import jakarta.transaction.Transactional;
 import mx.edu.utez.proyecto1c.controller.dto.RequestCrearUsuarioDTO;
 import mx.edu.utez.proyecto1c.exeption.customExceptions.BadRequestException;
 import mx.edu.utez.proyecto1c.model.persona.Persona;
 import mx.edu.utez.proyecto1c.model.usuario.Roles;
 import mx.edu.utez.proyecto1c.model.usuario.Usuario;
 import mx.edu.utez.proyecto1c.repository.usuario.UsuarioRepository;
+import mx.edu.utez.proyecto1c.repository.usuario.persona.PersonaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,9 +17,10 @@ import java.util.List;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
-
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    private final PersonaRepository personaRepository;
+    public UsuarioService(UsuarioRepository usuarioRepository, PersonaRepository personaRepository) {
         this.usuarioRepository = usuarioRepository;
+        this.personaRepository = personaRepository;
     }
 
     //servicios
@@ -25,6 +28,7 @@ public class UsuarioService {
         return usuarioRepository.findAll();
     }
 
+    @Transactional
     public Usuario createUser(RequestCrearUsuarioDTO payload){
         //validar si el username ya existe
         if(usuarioRepository.findByUsername(payload.getUsername()).isPresent()){
@@ -40,6 +44,9 @@ public class UsuarioService {
         newPersona.setEmail(payload.getEmail());
         newPersona.setCurp(payload.getCurp());
 
+        //creando registro de persona y obtener sus datos como registro existente
+        newPersona=personaRepository.save(newPersona);
+
 
         //crear instancia de usuario y llenarla en base a la info de payload
         Usuario newUser = new Usuario();
@@ -51,6 +58,8 @@ public class UsuarioService {
         newUser.setRol(
                 Roles.valueOf(payload.getRol())
         );
+
+        newUser.setPersona(newPersona);
 
 
         return usuarioRepository.save(newUser);
