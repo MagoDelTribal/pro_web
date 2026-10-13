@@ -1,0 +1,26 @@
+package mx.edu.utez.proyecto1c.model.cursos;
+
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@Table(name="cursos")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class Curso {
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    private long id;
+
+    private String nombre;
+    private int noUnidades;
+
+
+}
